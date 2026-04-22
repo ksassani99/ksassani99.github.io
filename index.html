@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kian Sassani, Hardware Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4f4f4;
+    --paper-deep: #e6e6e6;
+    --ink: #111111;
+    --ink-soft: #333333;
+    --ink-ghost: #777777;
+    --rule: #c4c4c4;
+    --rule-soft: #d8d8d8;
+    --red: #1a1a1a;
+    --red-deep: #000000;
+    --accent: #4a4a4a;
+    --highlight: #b8b8b8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.55;
+    font-feature-settings: "liga" 1, "kern" 1;
+    overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.35;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(80,80,80,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(80,80,80,0.06) 0%, transparent 50%);
+    mix-blend-mode: multiply;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+
+  .display { font-family: 'Fraunces', Georgia, serif; font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; font-weight: 400; line-height: 0.9; letter-spacing: -0.03em; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 400; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  .serif-italic { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-variation-settings: "opsz" 144, "SOFT" 100; }
+
+  .fiducial { position: fixed; width: 18px; height: 18px; z-index: 10; pointer-events: none; }
+  .fiducial::before, .fiducial::after { content: ''; position: absolute; background: var(--red); }
+  .fiducial::before { width: 100%; height: 1px; top: 50%; }
+  .fiducial::after { width: 1px; height: 100%; left: 50%; }
+  .fiducial .ring { position: absolute; inset: 3px; border: 1px solid var(--red); border-radius: 50%; }
+  .fiducial.tl { top: 24px; left: 24px; }
+  .fiducial.tr { top: 24px; right: 24px; }
+  .fiducial.bl { bottom: 24px; left: 24px; }
+  .fiducial.br { bottom: 24px; right: 24px; }
+
+  .status-bar {
+    position: fixed; top: 24px; left: 60px; right: 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 20;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-ghost); pointer-events: none;
+  }
+  .status-bar .dot { display: inline-block; width: 6px; height: 6px; background: var(--red); border-radius: 50%; margin-right: 8px; vertical-align: middle; animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .page { max-width: 1320px; margin: 0 auto; padding: 0 80px; position: relative; z-index: 3; }
+
+  .hero { padding: 110px 0 60px; position: relative; min-height: auto; display: flex; flex-direction: column; justify-content: center; }
+  .hero-label { display: flex; align-items: center; gap: 14px; margin-bottom: 48px; color: var(--red); }
+  .hero-label .bar { width: 60px; height: 1px; background: var(--red); }
+  .hero-name {
+    font-size: clamp(5rem, 14vw, 16rem); color: var(--ink); margin-bottom: 24px;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.08em;
+  }
+  .hero-name .first { font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; font-weight: 350; }
+  .hero-name .last { font-style: italic; font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; font-weight: 350; color: var(--red); }
+  .hero-name .ampersand { font-style: italic; color: var(--ink-ghost); font-size: 0.45em; align-self: center; margin: 0 0.1em; transform: translateY(-0.15em); }
+  .hero-tag { max-width: 720px; font-size: clamp(1.1rem, 1.6vw, 1.45rem); line-height: 1.5; color: var(--ink-soft); margin-top: 20px; font-weight: 400; }
+  .hero-tag em { color: var(--red); font-style: italic; font-family: 'Fraunces', serif; }
+  .hero-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule); }
+  .hero-meta .field .label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 8px; display: block; }
+  .hero-meta .field .value { font-family: 'Newsreader', serif; font-size: 1rem; color: var(--ink); font-weight: 500; }
+  .hero-meta .field .value a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); transition: border-color 0.2s; }
+  .hero-meta .field .value a:hover { border-color: var(--red); color: var(--red); }
+
+  .section-divider { display: flex; align-items: center; gap: 18px; padding: 16px 0; margin: 40px 0 24px; position: relative; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .section-divider .marker { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink); padding: 0 8px; display: flex; align-items: center; gap: 10px; }
+  .section-divider .marker .num { color: var(--red); font-weight: 500; }
+  .section-divider .marker .diamond { width: 5px; height: 5px; background: var(--red); transform: rotate(45deg); display: inline-block; }
+
+  .about { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; padding: 20px 0 40px; }
+  .about h2 { font-family: 'Fraunces', serif; font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 350; font-variation-settings: "opsz" 144; line-height: 1.05; margin-bottom: 20px; letter-spacing: -0.02em; }
+  .about h2 em { font-style: italic; color: var(--red); }
+  .about p { font-size: 1rem; line-height: 1.55; color: var(--ink-soft); margin-bottom: 14px; }
+  .about p:first-letter { font-family: 'Fraunces', serif; font-size: 2.8rem; float: left; line-height: 0.85; padding: 4px 10px 0 0; color: var(--red); font-weight: 350; font-variation-settings: "opsz" 144; }
+  .hero-identity { display: flex; align-items: center; gap: 36px; margin-bottom: 24px; flex-wrap: wrap; }
+  .hero-identity .hero-name { margin-bottom: 0; }
+  .hero-portrait { flex-shrink: 0; width: 170px; background: var(--paper-deep); padding: 10px; border: 1px solid var(--rule); position: relative; }
+  .hero-portrait::before { content: 'Fig. 00'; position: absolute; top: -9px; left: 12px; background: var(--paper); padding: 0 7px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); font-weight: 500; }
+  .hero-portrait::after { content: 'Levi\27s Stadium'; position: absolute; bottom: -18px; right: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-ghost); }
+  .hero-portrait img { width: 100%; display: block; }
+  @media (max-width: 700px) { .hero-identity { gap: 20px; } .hero-portrait { width: 130px; } }
+  .capabilities { padding-left: 24px; border-left: 1px solid var(--rule); }
+  .capabilities h3 { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 18px; }
+  .cap-group { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px dashed var(--rule-soft); }
+  .cap-group:last-child { border-bottom: 0; }
+  .cap-group .title { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--red); margin-bottom: 10px; font-variation-settings: "opsz" 144; }
+  .cap-group .items { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.7; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .project { padding: 40px 0 70px; position: relative; display: flex; flex-direction: column; }
+  .project-header { order: 1; display: grid; grid-template-columns: auto 1fr auto; gap: 40px; align-items: baseline; padding-bottom: 28px; margin-bottom: 32px; border-bottom: 1px solid var(--rule); }
+  .project .board-gallery { order: 2; margin-top: 0; margin-bottom: 56px; }
+  .project .project-body { order: 3; }
+  .project-number { font-family: 'Fraunces', serif; font-style: italic; font-size: 3rem; font-weight: 300; color: var(--red); line-height: 1; font-variation-settings: "opsz" 144; }
+  .project-title { font-family: 'Fraunces', serif; font-size: clamp(2.2rem, 4.2vw, 3.6rem); font-weight: 350; line-height: 1; letter-spacing: -0.02em; font-variation-settings: "opsz" 144, "SOFT" 100; }
+  .project-title em { font-style: italic; color: var(--red); }
+  .project-year { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--ink-ghost); text-transform: uppercase; text-align: right; }
+  .project-year span { display: block; color: var(--ink); font-weight: 500; margin-top: 4px; }
+  .project-year .team { color: var(--ink-ghost); font-weight: 400; margin-top: 8px; }
+  .project-body { display: grid; grid-template-columns: 2fr 1fr; gap: 60px; }
+  .project-description { font-size: 1.1rem; line-height: 1.65; color: var(--ink-soft); }
+  .project-description p { margin-bottom: 18px; }
+  .project-description p:first-child { font-family: 'Fraunces', serif; font-size: 1.45rem; line-height: 1.45; color: var(--ink); font-weight: 400; font-variation-settings: "opsz" 144, "SOFT" 100; margin-bottom: 28px; }
+  .project-description p:first-child em { font-style: italic; color: var(--red); }
+  .project-description .highlights { margin-top: 32px; padding-top: 28px; border-top: 1px dashed var(--rule-soft); }
+  .project-description .highlight-item { display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--rule-soft); align-items: baseline; }
+  .project-description .highlight-item:last-child { border-bottom: 0; }
+  .project-description .highlight-item .h-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); font-weight: 500; }
+  .project-description .highlight-item .h-val { font-family: 'Newsreader', serif; font-size: 0.98rem; color: var(--ink-soft); line-height: 1.5; }
+
+  .spec-sheet { background: var(--paper-deep); border: 1px solid var(--rule); padding: 28px; position: relative; align-self: start; position: sticky; top: 60px; }
+  .spec-sheet::before { content: ''; position: absolute; top: -1px; right: -1px; width: 40px; height: 40px; border-top: 2px solid var(--red); border-right: 2px solid var(--red); }
+  .spec-sheet::after { content: ''; position: absolute; bottom: -1px; left: -1px; width: 40px; height: 40px; border-bottom: 2px solid var(--red); border-left: 2px solid var(--red); }
+  .spec-sheet h4 { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink); padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--ink); display: flex; justify-content: space-between; align-items: center; }
+  .spec-sheet h4 .rev { color: var(--red); font-weight: 500; }
+  .spec-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 9px 0; border-bottom: 1px dotted var(--rule); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.02em; line-height: 1.5; }
+  .spec-row:last-child { border-bottom: 0; }
+  .spec-row .k { color: var(--ink-ghost); text-transform: uppercase; letter-spacing: 0.08em; }
+  .spec-row .v { color: var(--ink); text-align: right; font-weight: 500; }
+  .spec-row .v.red { color: var(--red); }
+
+  .board-gallery { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; }
+  .board-gallery.quad { grid-template-columns: repeat(2, 1fr); gap: 40px 24px; }
+  .board-gallery .board-frame { position: relative; background: var(--paper-deep); padding: 16px; border: 1px solid var(--rule); }
+  .board-gallery .board-frame::before { content: attr(data-label); position: absolute; top: -10px; left: 16px; background: var(--paper); padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); font-weight: 500; }
+  .board-gallery .board-frame::after { content: attr(data-caption); position: absolute; bottom: -30px; right: 16px; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-ghost); }
+  .board-gallery img { width: 100%; display: block; background: #111; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
+  .board-gallery .board-frame:hover img { transform: scale(1.03); }
+
+  .lesson-block { margin-top: 70px; padding: 36px 40px; background: var(--ink); color: var(--paper); position: relative; }
+  .lesson-block::before { content: '◆ LESSONS LEARNED'; position: absolute; top: -10px; left: 24px; background: var(--paper); color: var(--red); padding: 0 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; font-weight: 500; }
+  .lesson-block .lesson-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 40px; margin-top: 6px; }
+  .lesson-block .lesson { font-family: 'Newsreader', serif; font-size: 0.98rem; line-height: 1.4; color: var(--paper); padding: 10px 0; border-bottom: 1px dashed rgba(236, 217, 168, 0.2); display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: baseline; }
+  .lesson-block .lesson:nth-last-child(-n+2) { border-bottom: 0; }
+  .lesson-block .lesson .n { font-family: 'Fraunces', serif; font-style: italic; color: var(--highlight); font-size: 0.9rem; }
+
+  .resources { padding: 80px 0 100px; }
+  .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--rule); border: 1px solid var(--rule); }
+  .res-card { background: var(--paper); padding: 36px 28px; display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: background 0.3s; min-height: 220px; position: relative; cursor: pointer; }
+  .res-card:hover { background: var(--paper-deep); }
+  .res-card:hover .res-arrow { transform: translate(4px, -4px); color: var(--red); }
+  .res-card .res-num { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; color: var(--ink-ghost); text-transform: uppercase; margin-bottom: 48px; }
+  .res-card .res-title { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; margin-bottom: 12px; font-variation-settings: "opsz" 144; }
+  .res-card .res-title em { font-style: italic; color: var(--red); }
+  .res-card .res-desc { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.5; margin-top: auto; }
+  .res-card .res-arrow { position: absolute; top: 28px; right: 28px; font-family: 'Fraunces', serif; font-size: 1.4rem; color: var(--ink-ghost); transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
+
+  .footer { border-top: 1px solid var(--ink); padding: 40px 0 60px; margin-top: 80px; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; }
+  .footer-brand .big { font-family: 'Fraunces', serif; font-size: clamp(3rem, 8vw, 7rem); line-height: 0.9; font-weight: 350; font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; letter-spacing: -0.02em; }
+  .footer-brand .big em { font-style: italic; color: var(--red); }
+  .footer-brand .sub { margin-top: 16px; font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--ink-soft); font-variation-settings: "opsz" 144; }
+  .footer-col h4 { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
+  .footer-col a, .footer-col .item { display: block; font-family: 'Newsreader', serif; font-size: 0.95rem; color: var(--ink); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; width: fit-content; transition: border-color 0.2s, color 0.2s; }
+  .footer-col a:hover { color: var(--red); border-color: var(--red); }
+  .footer-rev { border-top: 1px solid var(--rule); padding-top: 20px; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-ghost); }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.9s cubic-bezier(0.19, 1, 0.22, 1), transform 0.9s cubic-bezier(0.19, 1, 0.22, 1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-d1 { transition-delay: 0.1s; }
+  .reveal-d2 { transition-delay: 0.2s; }
+  .reveal-d3 { transition-delay: 0.3s; }
+  .reveal-d4 { transition-delay: 0.4s; }
+
+  @media (max-width: 1100px) {
+    .page { padding: 0 50px; }
+    .about { grid-template-columns: 1fr; gap: 40px; }
+    .capabilities { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); padding-top: 40px; }
+    .project-body { grid-template-columns: 1fr; gap: 40px; }
+    .spec-sheet { position: relative; top: 0; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .hero-meta { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .lesson-block .lesson-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .page { padding: 0 28px; }
+    .status-bar { left: 28px; right: 28px; font-size: 0.58rem; }
+    .fiducial.tl, .fiducial.tr { top: 18px; }
+    .fiducial.tl, .fiducial.bl { left: 18px; }
+    .fiducial.tr, .fiducial.br { right: 18px; }
+    .fiducial.bl, .fiducial.br { bottom: 18px; }
+    .board-gallery, .board-gallery.quad { grid-template-columns: 1fr; }
+    .res-grid { grid-template-columns: 1fr; }
+    .project-header { grid-template-columns: 1fr; gap: 16px; }
+    .project-year { text-align: left; }
+    .footer-top { grid-template-columns: 1fr; }
+    .hero-meta { grid-template-columns: 1fr; }
+    .highlight-item { grid-template-columns: 1fr !important; gap: 4px !important; }
+    .lesson-block { padding: 28px 24px; }
+    .lesson-block .lesson-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fiducial tl"><div class="ring"></div></div>
+<div class="fiducial tr"><div class="ring"></div></div>
+<div class="fiducial bl"><div class="ring"></div></div>
+<div class="fiducial br"><div class="ring"></div></div>
+
+<div class="status-bar">
+  <div><span class="dot"></span>Portfolio &middot; Rev 2026.04</div>
+  <div>Sheet 01 / 01 &middot; Berkeley, CA</div>
+</div>
+
+<div class="page">
+
+  <section class="hero">
+    <div class="hero-label mono reveal">
+      <span class="bar"></span>
+      <span>Hardware Engineer &middot; Analog &amp; Mixed-Signal</span>
+    </div>
+
+    <div class="hero-identity reveal reveal-d1">
+      <div class="hero-portrait">
+        <img src="kian.jpg" alt="Kian Sassani">
+      </div>
+      <h1 class="hero-name display">
+        <span class="first">Kian</span>
+        <span class="last">Sassani</span>
+      </h1>
+    </div>
+
+    <p class="hero-tag reveal reveal-d2">
+      I design precision analog and mixed-signal hardware: high-voltage isolation,
+      sensor interfaces, and embedded systems. Currently at UC Berkeley, building boards
+      for <em>Formula Electric at Berkeley</em>.
+    </p>
+
+    <div class="hero-meta">
+      <div class="field reveal reveal-d3">
+        <span class="label">Discipline</span>
+        <span class="value">PCB &middot; Analog &middot; Embedded</span>
+      </div>
+      <div class="field reveal reveal-d3">
+        <span class="label">Enrollment</span>
+        <span class="value">UC Berkeley &middot; EECS '28</span>
+      </div>
+      <div class="field reveal reveal-d4">
+        <span class="label">Contact</span>
+        <span class="value"><a href="mailto:kiansassani@berkeley.edu">kiansassani@berkeley.edu</a></span>
+      </div>
+      <div class="field reveal reveal-d4">
+        <span class="label">Profile</span>
+        <span class="value"><a href="https://linkedin.com/in/kiansassani" target="_blank" rel="noopener">linkedin.com/in/kiansassani</a></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider reveal">
+    <div class="marker"><span class="num">&sect; 00</span><span class="diamond"></span><span>About</span></div>
+  </div>
+
+  <section class="about">
+    <div class="reveal">
+      <h2>Sophomore EECS student<br>focused on <em>analog and mixed-signal hardware.</em></h2>
+      <p>
+        I design boards for high-stakes systems where small errors, like a microvolt of noise
+        or a millimeter of bad routing, can cause a failed competition run or a battery
+        management fault at 588V. At Formula Electric at Berkeley, I own schematic and
+        layout for vehicle subsystems from concept through bring-up.
+      </p>
+      <p>
+        My coursework covers analog circuits, signals &amp; systems, and computer architecture.
+        Most of my hands-on work happens in Altium, LTspice, and at the bench, with a focus on
+        measurements I can trust and schematics that are clear to read.
+      </p>
+    </div>
+
+    <div class="capabilities reveal reveal-d2">
+      <h3>&#9670; Technical Index</h3>
+
+      <div class="cap-group">
+        <div class="title">Circuit Design</div>
+        <div class="items">
+          Altium Designer &middot; KiCad &middot; Schematic Capture &middot;<br>
+          Analog Op-Amp Topologies &middot; RC Filtering &middot;<br>
+          Power Integrity &middot; Mixed-Signal Layout
+        </div>
+      </div>
+
+      <div class="cap-group">
+        <div class="title">Embedded Systems</div>
+        <div class="items">
+          STM32 &middot; ESP32 &middot; I2C &middot; SPI &middot; CAN &middot;<br>
+          PWM &middot; USB &middot; Sensor Fusion &middot;<br>
+          Hall-Effect &amp; Quadrature Interfaces
+        </div>
+      </div>
+
+      <div class="cap-group">
+        <div class="title">Testing &amp; Analysis</div>
+        <div class="items">
+          LTspice &middot; Oscilloscope &middot; Network Analyzer &middot;<br>
+          Bode / Frequency Response &middot; AC Simulation &middot;<br>
+          Bring-up &amp; Validation
+        </div>
+      </div>
+
+      <div class="cap-group">
+        <div class="title">Programming</div>
+        <div class="items">
+          Verilog &middot; C / C++ &middot; Python &middot;<br>
+          Java &middot; SQL &middot; JavaScript &middot; R
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider reveal">
+    <div class="marker"><span class="num">&sect; 01</span><span class="diamond"></span><span>Selected Work</span></div>
+  </div>
+
+  <section class="project" id="iv-meter">
+    <div class="project-header reveal">
+      <div class="project-number serif-italic">01</div>
+      <h2 class="project-title">
+        High-Voltage<br>
+        <em>Isolated Sensing Interface</em>
+      </h2>
+      <div class="project-year">
+        Formula Electric &middot; FSAE<br>
+        <span>JAN 2026 &mdash; PRESENT</span>
+      </div>
+    </div>
+
+    <div class="project-body">
+      <div class="project-description reveal">
+        <p>
+          A single PCB that measures voltage and current across a <em>588V tractive system</em>
+          without ever letting the high-voltage rail touch the low-voltage microcontroller.
+          Three isolation boundaries (resistive, power, and digital) in one board.
+        </p>
+
+        <p>
+          The architecture splits the PCB into two galvanically separated domains. On the
+          HV side, a precision six-element 120:1 resistive divider scales 420&ndash;588V down to
+          a 3.47&ndash;4.85V signal, buffered through an OPA192 unity-gain op-amp into a 16-bit
+          ADC. Current is sensed with two Hall-effect ICs: one coarse on the 5V domain
+          for peak traction loads, and one sensitive on the 3V3 domain for cruising, both
+          buffered and digitized.
+        </p>
+
+        <p>
+          A UCC12040 isolated DC/DC carries a clean 5V across the boundary to power the
+          HV-side analog front end, while an ISO1640 bidirectional I2C isolator and a
+          TXS0102 level shifter let the LV microcontroller talk to the ADC over a single
+          I2C bus. A LM1117 LDO provides the 3V3 rail. The result is a compact, clean
+          sensor interface that turns a scary voltage into trustworthy numbers.
+        </p>
+
+        <div class="highlights">
+          <div class="highlight-item"><span class="h-label">Architecture</span><span class="h-val">Two galvanically separated domains; all HV-to-LV signals cross through resistive, power, and digital isolation boundaries into one I&sup2;C output bus</span></div>
+          <div class="highlight-item"><span class="h-label">Sensing</span><span class="h-val">Six-element 120:1 divider scales 420&ndash;588&nbsp;V into a 3.47&ndash;4.85&nbsp;V signal, buffered by an OPA192 op-amp into a 16-bit &Delta;-&Sigma; ADC; dual-range Hall-effect current sensing captures both peak and cruising loads</span></div>
+          <div class="highlight-item"><span class="h-label">Power</span><span class="h-val">UCC12040 isolated DC/DC carries a clean 5&nbsp;V across the barrier to the HV-side analog front end, with a local LDO dropping to 3V3 for the digital domain</span></div>
+          <div class="highlight-item"><span class="h-label">Comms / I/O</span><span class="h-val">Bidirectional I&sup2;C isolator plus a 5V&harr;3V3 level shifter bridges the HV-side ADC to the LV microcontroller; a 6-pin Duraclik feeds the vehicle harness</span></div>
+          <div class="highlight-item"><span class="h-label">Scope</span><span class="h-val">Owned schematic and layout end to end; board revision 3/10/2026 out for fabrication, bring-up queued on return</span></div>
+        </div>
+      </div>
+
+      <aside class="spec-sheet reveal reveal-d2">
+        <h4><span>Spec Sheet</span><span class="rev">REV 03&middot;10&middot;26</span></h4>
+        <div class="spec-row"><span class="k">Project</span><span class="v">IV Meter</span></div>
+        <div class="spec-row"><span class="k">Layers</span><span class="v">4L FR-4 (2 sig + 2 GND)</span></div>
+        <div class="spec-row"><span class="k">HV Rating</span><span class="v red">600 V DC</span></div>
+        <div class="spec-row"><span class="k">EDA</span><span class="v">Altium Designer</span></div>
+        <div class="spec-row"><span class="k">Sim</span><span class="v">LTspice</span></div>
+        <div class="spec-row"><span class="k">Status</span><span class="v red">&#9673; Active</span></div>
+      </aside>
+    </div>
+
+    <div class="board-gallery">
+      <div class="board-frame reveal" data-label="Fig. 1.1 &middot; Altium Layout" data-caption="Top + Bottom Silk">
+        <img src="images/iv-meter-1.jpg" alt="IV Meter PCB Altium 2D layout">
+      </div>
+      <div class="board-frame reveal reveal-d2" data-label="Fig. 1.2 &middot; 3D Render" data-caption="Assembled View">
+        <img src="images/iv-meter-2.jpg" alt="IV Meter PCB 3D render with components">
+      </div>
+    </div>
+  </section>
+
+  <section class="project" id="aim" style="padding-top: 40px;">
+    <div class="project-header reveal">
+      <div class="project-number serif-italic">02</div>
+      <h2 class="project-title">
+        Autonomous<br>
+        <em>Integration Module</em>
+      </h2>
+      <div class="project-year">
+        Formula Electric &middot; FSAE<br>
+        <span>SEPT 2024 &mdash; MAY 2025</span>
+      </div>
+    </div>
+
+    <div class="project-body">
+      <div class="project-description reveal">
+        <p>
+          A sensor-fusion and vehicle-state board, the <em>central nervous system</em>
+          between the car's motion sensors and its control electronics. IMU, wheel speed,
+          brake command, and status lighting, all on one STM32-plugin carrier over CAN.
+        </p>
+
+        <p>
+          AIM integrates a BNO055 9-DOF IMU with dual quadrature wheel-speed interfaces,
+          where each sensor outputs phase-shifted square waves: frequency encodes speed,
+          phase encodes direction. A dedicated level-shifting and filtering network
+          conditions the signals for the MCU. Status illumination is driven through
+          six NMOS low-side switches with 10k pulldowns, providing deterministic state
+          when the MCU isn't actively driving the bus.
+        </p>
+
+        <p>
+          Power splits across a TPSM84205 (24V &rarr; 5V) and TPSM84212 (24V &rarr; 12V) for the
+          heavier rails, with an LM1117 LDO dropping to 3V3 for the digital domain.
+          The board also runs dual CAN bus channels, an SD card logger, and a PWM-driven
+          brake-light output. Bringing up this many interfaces on one board was my first
+          real lesson in BOM discipline and layout planning.
+        </p>
+
+        <div class="highlights">
+          <div class="highlight-item"><span class="h-label">Architecture</span><span class="h-val">STM32 plugin carrier fusing IMU, wheel-speed, status lighting, and brake command into a single CAN node on the vehicle bus</span></div>
+          <div class="highlight-item"><span class="h-label">Sensing</span><span class="h-val">9-DOF IMU on the I&sup2;C sensor bus paired with dual quadrature wheel-speed interfaces; phase-shifted square waves are conditioned through a level-shifting and filtering network and decoded in firmware</span></div>
+          <div class="highlight-item"><span class="h-label">Power</span><span class="h-val">Hybrid rail tree: TPSM84205 (24V&rarr;5V) and TPSM84212 (24V&rarr;12V) buck modules handle heavy rails, with an LM1117 LDO generating the 3V3 digital supply</span></div>
+          <div class="highlight-item"><span class="h-label">Comms / I/O</span><span class="h-val">Dual CAN1 / CAN2 channels, SPI SD-card logger, six NMOS low-side status lights with 10k pulldowns, and a PWM-driven brake-light output</span></div>
+          <div class="highlight-item"><span class="h-label">Scope</span><span class="h-val">Owned schematic and layout; the integrated vehicle-state stack cut overall positioning error by roughly 75% versus the prior split-board sensor chain</span></div>
+        </div>
+      </div>
+
+      <aside class="spec-sheet reveal reveal-d2">
+        <h4><span>Spec Sheet</span><span class="rev">REV 10&middot;06&middot;25</span></h4>
+        <div class="spec-row"><span class="k">Project</span><span class="v">AIM</span></div>
+        <div class="spec-row"><span class="k">Host MCU</span><span class="v">STM32 / MicroBasic</span></div>
+        <div class="spec-row"><span class="k">Layers</span><span class="v">4L FR-4 (2 sig + 2 GND)</span></div>
+        <div class="spec-row"><span class="k">Input Rail</span><span class="v red">+24 V</span></div>
+        <div class="spec-row"><span class="k">EDA</span><span class="v">Altium Designer</span></div>
+        <div class="spec-row"><span class="k">Status</span><span class="v">&#9673; Completed</span></div>
+      </aside>
+    </div>
+
+    <div class="board-gallery">
+      <div class="board-frame reveal" data-label="Fig. 2.1 &middot; Altium Layout" data-caption="Top Copper + Silk">
+        <img src="images/aim-1.jpg" alt="AIM PCB Altium layout">
+      </div>
+      <div class="board-frame reveal reveal-d2" data-label="Fig. 2.2 &middot; 3D Render" data-caption="With Switchcraft Connectors">
+        <img src="images/aim-2.jpg" alt="AIM PCB 3D render">
+      </div>
+    </div>
+  </section>
+
+  <section class="project" id="gameboy" style="padding-top: 40px;">
+    <div class="project-header reveal">
+      <div class="project-number serif-italic">03</div>
+      <h2 class="project-title">
+        Space Invaders<br>
+        <em>Handheld Console</em>
+      </h2>
+      <div class="project-year">
+        Coursework (HOPE) &middot; Team Project<br>
+        <span>DEC 2025</span>
+        <span class="team">w/ Rahil Pasha, Lucas Bates, Zena Wu</span>
+      </div>
+    </div>
+
+    <div class="project-body">
+      <div class="project-description reveal">
+        <p>
+          A Game Boy&ndash;style handheld on a <em>custom 2-layer PCB</em>, built around an
+          ESP32-S3 and a 1.8&#8243; LCD. It actually plays Space Invaders. A course project
+          about form-factor discipline, signal integrity at low cost, and the joy of a
+          board that fits in your palm.
+        </p>
+
+        <p>
+          Compute runs on an ESP32-S3-WROOM-1 programmed through the Arduino Core, driving
+          a 1.8-inch ST7735 TFT over SPI (TFT-eSPI library) and a K50 8&Omega; speaker through
+          a PAM8302A Class-D mono amp on I&sup2;S. The display is 320&times;240&times;16-bit color at a
+          frame rate generous enough for arcade sprites and smooth alien descents.
+        </p>
+
+        <p>
+          Inputs are a three-button cluster (Start, Reset, Boot) with RC low-pass
+          debouncing and a Bourns PEC11R rotary encoder with integrated push-switch,
+          decoded in firmware via quadrature. Power comes from three AAA cells in
+          series feeding an LD1117S33 3V3 LDO, with a USB-C receptacle for programming
+          and a pair of PMEG3030 Schottky diodes isolating the USB and battery rails so
+          the two supplies can coexist safely.
+        </p>
+
+        <div class="highlights">
+          <div class="highlight-item"><span class="h-label">Architecture</span><span class="h-val">ESP32-S3 compute core drives an SPI display, I&sup2;S audio path, and GPIO input cluster on a single custom 2-layer board (~35 components, Space Invaders silkscreen art)</span></div>
+          <div class="highlight-item"><span class="h-label">Display</span><span class="h-val">1.8&#8243; ST7735 TFT over SPI, 320&times;240 at 16-bit color, driven through the TFT-eSPI Arduino library at a frame rate generous enough for arcade sprites</span></div>
+          <div class="highlight-item"><span class="h-label">Audio</span><span class="h-val">PAM8302A Class-D mono amp (3.2&nbsp;W, 9WLP) driven over I&sup2;S, feeding a K50 8&nbsp;&Omega; speaker</span></div>
+          <div class="highlight-item"><span class="h-label">Inputs</span><span class="h-val">Three tactile switches (Start, Reset, Boot) with RC low-pass debouncing, plus a Bourns PEC11R rotary encoder with integrated push-switch, quadrature decoded in firmware</span></div>
+          <div class="highlight-item"><span class="h-label">Power</span><span class="h-val">Dual-source supply: three AAA cells in series (~4.5&nbsp;V) or USB-C bench power, isolated through a pair of PMEG3030 Schottky diodes so the rails coexist safely</span></div>
+          <div class="highlight-item"><span class="h-label">Scope</span><span class="h-val">Team of four; I owned schematic capture and portions of routing, from form-factor definition through fab and bring-up</span></div>
+        </div>
+      </div>
+
+      <aside class="spec-sheet reveal reveal-d2">
+        <h4><span>Spec Sheet</span><span class="rev">HOPE 2025</span></h4>
+        <div class="spec-row"><span class="k">Project</span><span class="v">Space Invaders</span></div>
+        <div class="spec-row"><span class="k">MCU</span><span class="v">ESP32-S3</span></div>
+        <div class="spec-row"><span class="k">Layers</span><span class="v">2L FR-4</span></div>
+        <div class="spec-row"><span class="k">LDO</span><span class="v">LD1117S33</span></div>
+        <div class="spec-row"><span class="k">EDA</span><span class="v">KiCad</span></div>
+        <div class="spec-row"><span class="k">Firmware</span><span class="v">Arduino Core</span></div>
+        <div class="spec-row"><span class="k">Status</span><span class="v">&#9673; Completed</span></div>
+      </aside>
+    </div>
+
+    <div class="board-gallery quad">
+      <div class="board-frame reveal" data-label="Fig. 3.1 &middot; Assembly (Front)" data-caption="Powered Board, Pop. Top">
+        <img src="images/gameboy-1.jpg" alt="Space Invaders handheld assembled front face showing LCD and rotary encoder">
+      </div>
+      <div class="board-frame reveal reveal-d2" data-label="Fig. 3.2 &middot; Assembly (Back)" data-caption="3&times;AAA Holder">
+        <img src="images/gameboy-2.jpg" alt="Space Invaders handheld back with AAA battery holder">
+      </div>
+      <div class="board-frame reveal" data-label="Fig. 3.3 &middot; KiCad Render" data-caption="Top Silk (Green)">
+        <img src="images/gameboy-3.jpg" alt="KiCad 3D render of Space Invaders handheld PCB">
+      </div>
+      <div class="board-frame reveal reveal-d2" data-label="Fig. 3.4 &middot; Routing" data-caption="2-Layer F+B Copper">
+        <img src="images/gameboy-4.jpg" alt="KiCad 2D PCB layout showing 2-layer copper routing">
+      </div>
+    </div>
+
+  </section>
+
+  <div class="section-divider reveal">
+    <div class="marker"><span class="num">&sect; 02</span><span class="diamond"></span><span>Resources &amp; Documentation</span></div>
+  </div>
+
+  <section class="resources">
+    <div class="res-grid">
+      <a class="res-card reveal" href="docs/resume.pdf" download="Kian_Sassani_Resume.pdf">
+        <div class="res-num">&darr; Doc 01</div>
+        <div class="res-arrow">&#10515;</div>
+        <div class="res-title"><em>Resume</em></div>
+        <div class="res-desc">Spring 2026 resume: coursework, experience, and full project narratives. Click to download.</div>
+      </a>
+
+      <a class="res-card reveal reveal-d2" href="docs/iv-meter-schematic.pdf" download="IV_Meter_Schematic.pdf">
+        <div class="res-num">&darr; Doc 02</div>
+        <div class="res-arrow">&#10515;</div>
+        <div class="res-title">IV Meter <em>Schematic</em></div>
+        <div class="res-desc">Full Altium schematic export: HV input, isolation, ADC, power domains, connector pinout.</div>
+      </a>
+
+      <a class="res-card reveal reveal-d3" href="docs/aim-schematic.pdf" download="AIM_Schematic.pdf">
+        <div class="res-num">&darr; Doc 03</div>
+        <div class="res-arrow">&#10515;</div>
+        <div class="res-title">AIM <em>Schematic</em></div>
+        <div class="res-desc">Nine-sheet hierarchical schematic: MCU, wheel-speed, status lights, power tree.</div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="big display">Open for<br><em>summer '26.</em></div>
+        <div class="sub">Seeking internships in analog, mixed-signal, and embedded hardware.</div>
+      </div>
+
+      <div class="footer-col">
+        <h4>&#9670; Contact</h4>
+        <a href="mailto:kiansassani@berkeley.edu">kiansassani@<br>berkeley.edu</a>
+        <a href="tel:+16692430908">+1 (669) 243-0908</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>&#9670; Network</h4>
+        <a href="https://linkedin.com/in/kiansassani" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>&#9670; Navigate</h4>
+        <a href="#iv-meter">&sect; 01 &middot; IV Meter</a>
+        <a href="#aim">&sect; 02 &middot; AIM</a>
+        <a href="#gameboy">&sect; 03 &middot; Space Invaders</a>
+      </div>
+    </div>
+
+    <div class="footer-rev">
+      <span>&copy; 2026 Kian Sassani &middot; Berkeley, CA</span>
+      <span>Sheet 01 / 01 &middot; Rev 2026.04</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  const heroName = document.querySelector('.hero-name');
+  window.addEventListener('mousemove', (e) => {
+    if (!heroName) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 8;
+    const y = (e.clientY / window.innerHeight - 0.5) * 6;
+    heroName.style.transform = `translate(${x}px, ${y}px)`;
+  });
+</script>
+
+</body>
+</html>
