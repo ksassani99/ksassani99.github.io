@@ -112,6 +112,14 @@
   .about h2 em { font-style: italic; color: var(--red); }
   .about p { font-size: 1rem; line-height: 1.55; color: var(--ink-soft); margin-bottom: 14px; }
   .about p:first-letter { font-family: 'Fraunces', serif; font-size: 2.8rem; float: left; line-height: 0.85; padding: 4px 10px 0 0; color: var(--red); font-weight: 350; font-variation-settings: "opsz" 144; }
+  .about-intro { display: flex; gap: 26px; align-items: flex-start; margin-bottom: 22px; }
+  .about-intro .about-text { flex: 1; min-width: 0; }
+  .about-intro h2 { margin-bottom: 0; }
+  .about-portrait { flex-shrink: 0; width: 170px; background: var(--paper-deep); padding: 10px; border: 1px solid var(--rule); position: relative; }
+  .about-portrait::before { content: 'Fig. 00'; position: absolute; top: -9px; left: 12px; background: var(--paper); padding: 0 7px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); font-weight: 500; }
+  .about-portrait::after { content: 'Levi\27s Stadium'; position: absolute; bottom: -18px; right: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-ghost); }
+  .about-portrait img { width: 100%; display: block; filter: grayscale(1) contrast(1.02); }
+  @media (max-width: 700px) { .about-intro { flex-direction: column; } .about-portrait { width: 140px; } }
   .capabilities { padding-left: 24px; border-left: 1px solid var(--rule); }
   .capabilities h3 { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 18px; }
   .cap-group { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px dashed var(--rule-soft); }
@@ -281,7 +289,14 @@
 
   <section class="about">
     <div class="reveal">
-      <h2>A sophomore EECS student<br>in pursuit of <em>quiet signals.</em></h2>
+      <div class="about-intro">
+        <div class="about-portrait">
+          <img src="kian.jpg" alt="Kian Sassani">
+        </div>
+        <div class="about-text">
+          <h2>A sophomore EECS student<br>in pursuit of <em>quiet signals.</em></h2>
+        </div>
+      </div>
       <p>
         I build hardware that has to work: boards where a microvolt of noise or a millimeter of
         bad routing shows up as a failed competition run or a battery management fault at 588V.
